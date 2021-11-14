@@ -1,0 +1,241 @@
+/* tạo CSDL Quản lý đề án*/
+CREATE DATABASE QLDAAA
+GO
+USE QLDAAA
+GO
+/* tạo các bảng của CSDL*/
+CREATE TABLE NHANVIEN
+(
+	manv CHAR(3) PRIMARY KEY,
+	honv CHAR(20),
+	tenlot CHAR(20),
+	tennv CHAR(20),
+	ngsinh DATE,
+	phai CHAR(3),
+	dchi NCHAR(100),
+	ma_nql NCHAR(3),
+	phg INT,
+	luong FLOAT
+)
+CREATE TABLE PHONGBAN
+(
+	maphg INT PRIMARY KEY,
+	tenphg CHAR(10),
+	trphg CHAR(3) REFERENCES NHANVIEN(manv),
+	ngay_nhanchuc DATE 
+)
+CREATE TABLE DEAN
+(
+	mada INT PRIMARY KEY,
+	tenda CHAR(30),
+	ddiem_da CHAR(100),
+	phong INT REFERENCES PHONGBAN(maphg)
+)
+CREATE TABLE PHANCONG
+(
+	ma_nvien CHAR(3) REFERENCES NHANVIEN(manv),
+	soda INT REFERENCES DEAN(mada),
+	thoigian FLOAT
+)
+CREATE TABLE DIADIEM_PHG
+(
+	maphg INT REFERENCES PHONGBAN(maphg),
+	diadiem CHAR(30)
+)
+CREATE TABLE THANNHAN
+(
+	ma_nvien CHAR(3) REFERENCES NHANVIEN(manv),
+	tentn CHAR(50),
+	phai NCHAR(5) CHECK (phai in ('nam','nữ')),
+	ngsinh DATE,
+	quanhe CHAR(30)
+)
+
+
+
+/*tạo CDSL cho các bảng*/
+/*tạo dl cho bảng NHANVIEN*/
+INSERT INTO NHANVIEN VALUES (123,'Dinh','Ba','Tien','01/09/1955','Nam',N'731 Trần Hưng Đạo Q5 TpHCM',333,5,30000)
+INSERT INTO NHANVIEN VALUES (333,'Nguyen','Thanh','Tung','12/08/1945','Nam',N'638 Nguyễn Văn Cừ Q5 TpHCM',888,5,40000)
+INSERT INTO NHANVIEN VALUES (453,'Tran','Thanh','Tam','07/31/1962','Nam',N'543 Mai Thị Lựu Ba Đình Hà Nội',333,5,25000)
+INSERT INTO NHANVIEN VALUES (666,'Nguyen','Manh','Hung','09/15/1952','Nam',N'975 Lê Lai P3 Vũng Tàu',333,5,38000)
+INSERT INTO NHANVIEN VALUES (888,'Vuong','Ngoc','Quyen','10/10/1927','Nu',N'450 Trưng Vương Mỹ Tho Tiền Giang','',1,55000)
+INSERT INTO NHANVIEN VALUES (987,'Le','Thi','Nhan','06/20/1931','Nu',N'291 Hồ Văn Huê Q.Phú Nhuận TpHCM',888,4,43000)
+INSERT INTO NHANVIEN VALUES (777,'Tran','Hong','Quang','03/29/1959','Nam',N'980 Lê Hồng Phong Vũng Tàu',987,4,25000)
+INSERT INTO NHANVIEN VALUES (999,'Bui','Thuy','Vu','07/19/1958','Nam',N'332 Nguyễn Thái Học Quy Nhơn',987,4,25000)
+/*tạo dl cho bảng PHONGBAN*/
+INSERT INTO PHONGBAN VALUES (1,'Quan ly',888,'06/19/1971')
+INSERT INTO PHONGBAN VALUES (4,'Dieu hanh',777,'01/01/1985')
+INSERT INTO PHONGBAN VALUES (5,'Nghien cuu',333,'05/22/1978')
+--select * from PHONGBAN
+/*tạo dl cho bảng DIADIEM_PHG*/
+INSERT INTO DIADIEM_PHG VALUES (1,'TP HCM')
+INSERT INTO DIADIEM_PHG VALUES (4,'HA NOI')
+INSERT INTO DIADIEM_PHG VALUES (5,'NHA TRANG')
+INSERT INTO DIADIEM_PHG VALUES (5,'TP HCM')
+INSERT INTO DIADIEM_PHG VALUES (5,'VUNG TAU')
+--select * from DIADIEM_PHG
+/*tạo dl cho bảng DEAN*/
+INSERT INTO DEAN VALUES (1,'San pham X','VUNG TAU',5)
+INSERT INTO DEAN VALUES (2,'San pham Y','NHA TRANG',5)
+INSERT INTO DEAN VALUES (3,'San pham Z','TP HCM',5)
+INSERT INTO DEAN VALUES (10,'Tin hoc hoa','HA NOI',4)
+INSERT INTO DEAN VALUES (20,'Cap quang','TP HCM',1)
+INSERT INTO DEAN VALUES (30,'Dao tao','HA NOI',4)
+--select * from DEAN
+/*tạo dl cho bảng PHANCONG*/
+INSERT INTO PHANCONG VALUES (123,1,22.5)
+INSERT INTO PHANCONG VALUES (123,2,7.5)
+INSERT INTO PHANCONG VALUES (123,3,10)
+INSERT INTO PHANCONG VALUES (333,10,10)
+INSERT INTO PHANCONG VALUES (333,20,10)
+INSERT INTO PHANCONG VALUES (453,1,20)
+INSERT INTO PHANCONG VALUES (453,2,20)
+INSERT INTO PHANCONG VALUES (666,3,40)
+INSERT INTO PHANCONG VALUES (888,20,0)
+INSERT INTO PHANCONG VALUES (987,20,15)
+INSERT INTO PHANCONG VALUES (987,30,20)
+INSERT INTO PHANCONG VALUES (777,10,35)
+INSERT INTO PHANCONG VALUES (777,30,5)
+INSERT INTO PHANCONG VALUES (999,10,10)
+INSERT INTO PHANCONG VALUES (999,30,30)
+--select * from PHANCONG
+/*tạo dl cho THANNHAN*/
+INSERT INTO THANNHAN VALUES (123,'Chau','nữ','12/31/1978','Con gai')
+INSERT INTO THANNHAN VALUES (123,'Duy','Nam','01/01/1978','Con trai')
+INSERT INTO THANNHAN VALUES (123,'Phuong','nữ','05/05/1957','Vo chong')
+INSERT INTO THANNHAN VALUES (333,'Duong','nữ','05/03/1948','Vo chong')
+INSERT INTO THANNHAN VALUES (333,'Tung','Nam','10/25/1973','Con trai')
+INSERT INTO THANNHAN VALUES (333,'Quang','nữ','04/05/1976','Con gai')
+INSERT INTO THANNHAN VALUES (987,'Dang','Nam','02/09/1932','Vo chong')
+
+/**==============TRIGGER==================**/
+--I--
+/**1. Tạo trigger khi thêm nhân viên mới thì lương phải từ 2000 trở lên. 
+Nếu dữ liệu không hợp lệ thì không cho thêm vào và xuất hiện 
+thông báo “Lương nhân viên phải lớn hơn 2000”.**/ 
+CREATE TRIGGER TG_THEMNHANVIENVIENVIEN
+ON NHANVIEN
+FOR INSERT
+AS
+BEGIN
+	IF ( SELECT luong FROM inserted ) < 2000
+		BEGIN
+			PRINT N'LƯƠNG NHÂN VIÊN PHẢI LỚN HƠN 2000'
+			ROLLBACK TRANSACTION
+		END
+END
+---NHẬP---
+INSERT INTO NHANVIEN VALUES (209,'Dinh','Ba','Tien','01/09/1955','Nam',N'731 Trần Hưng Đạo Q5 TpHCM',333,5,1000)
+INSERT INTO NHANVIEN VALUES (208,'Dinh','Ba','Tien','01/09/2000','Nam',N'731 Trần Hưng Đạo Q5 TpHCM',333,5,2000)
+
+/**2. Tạo trigger để chỉ có thể thêm nhân viên có tuổi phải từ 18 tới 60. 
+Nhân viên có độ tuổi không phù hợp thì không được thêm vào.**/
+CREATE TRIGGER TG_THEMNHANVIENVIEN
+ON NHANVIEN
+FOR INSERT
+AS
+BEGIN
+	IF EXISTS ( SELECT * FROM inserted WHERE DATEDIFF(YEAR, ngsinh, GETDATE())NOT BETWEEN 18 AND 60)
+		BEGIN
+			PRINT N' TUỔI PHẢI TỪ 18 TỚI 60'
+			ROLLBACK TRANSACTION
+		END
+END
+--NHẬP THÔNG TIN--
+INSERT INTO NHANVIEN VALUES (205,'Dinh','Ba','Tien','01/09/2000','Nam',N'731 Trần Hưng Đạo Q5 TpHCM',333,5,6000)
+INSERT INTO NHANVIEN VALUES (206,'Dinh','Ba','Tien','01/09/2020','Nam',N'731 Trần Hưng Đạo Q5 TpHCM',333,5,6000)
+
+/**3. Tạo trigger cho hành động cập nhật lương nhân viên với điều kiện 
+lương mới phải lớn hơn lương cũ.**/
+CREATE TRIGGER TG_CAPNHAPLUONG
+ON NHANVIEN
+FOR UPDATE
+AS
+BEGIN
+	IF EXISTS ( SELECT *FROM inserted, deleted WHERE inserted.luong<deleted.luong) 
+		BEGIN
+			PRINT N'LƯƠNG MỚI PHẢI LỚN HƠN LƯƠNG CŨ'
+			ROLLBACK TRANSACTION
+		END
+END
+--NHẬP--
+UPDATE NHANVIEN
+SET luong=10000000000
+WHERE manv=123
+---------
+UPDATE NHANVIEN
+SET luong=1000
+WHERE manv=123
+
+--II--
+/**1. Hiển thị tổng số nhân viên sau khi có hành động thêm mới nhân viên.**/
+CREATE TRIGGER TG_TONGSONHANVIEN
+ON NHANVIEN
+AFTER INSERT
+AS
+BEGIN
+	DECLARE @NV FLOAT
+	SELECT @NV=COUNT(manv)
+	FROM NHANVIEN
+	PRINT @NV
+	DECLARE @NVADD FLOAT
+	SET @NVADD= ( SELECT COUNT(*) FROM inserted)
+	DECLARE @NVT FLOAT
+	SET @NVT = @NV + @NVADD
+END
+--NHẬP THÔNG TIN--
+INSERT INTO NHANVIEN VALUES (301,'Dinh','Ba','Tien','01/09/2000','Nam',N'731 Trần Hưng Đạo Q5 TpHCM',333,5,30000)
+
+/**2. Hiển thị tổng số nhân viên nữ, tổng số nhân viên nam sau khi có 
+hành động thêm mới nhân viên.**/
+CREATE TRIGGER TG_TONGNAMTONGNU
+ON NHANVIEN
+AFTER INSERT
+AS
+BEGIN
+	SELECT COUNT(manv) AS SOLUONGNHANVIEN, phai
+	FROM NHANVIEN
+	GROUP BY phai
+	
+END
+--NHẬP THÔNG TIN--
+INSERT INTO NHANVIEN VALUES (322,'Dinh','Ba','Tien','01/09/2000','Nam',N'731 Trần Hưng Đạo Q5 TpHCM',333,5,30000)
+INSERT INTO NHANVIEN VALUES (312,'Dinh','Ba','Tien','01/09/2000','Nu',N'731 Trần Hưng Đạo Q5 TpHCM',333,5,30000)
+
+/**3. Hiển thị tổng số nhân viên nữ, tổng số nhân viên nam sau khi có 
+hành động cập nhật giới tính nhân viên.**/
+CREATE TRIGGER TG_CAPNHAPPHAI
+ON NHANVIEN
+AFTER UPDATE
+AS
+BEGIN
+	SELECT COUNT(manv) AS SOLUONGNHANVIEN2, phai
+	FROM NHANVIEN
+	GROUP BY  phai
+END
+--NHẬP THÔNG TIN--
+UPDATE NHANVIEN
+SET phai='Nu'
+WHERE manv=312
+
+/**4. Hiển thị tổng số đề án mà nhân viên đã làm khi có hành động xóa 
+trên bảng Phancong.**/
+CREATE TRIGGER TG_TONGSODEAN
+ON PHANCONG
+AFTER DELETE
+AS
+BEGIN
+	SELECT COUNT(mada) AS TONGSODEAN, ma_nvien
+	FROM DEAN, PHANCONG
+	WHERE DEAN.mada=PHANCONG.soda
+	GROUP BY ma_nvien
+END
+--NHẬP THÔNG TIN--
+DELETE FROM PHANCONG WHERE soda=1
+
+
+
+
+
+
